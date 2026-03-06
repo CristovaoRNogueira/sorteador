@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>cd 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteador - Março com Elas 2026</title>
@@ -29,9 +29,11 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            /* Impede seleção acidental de texto durante a apresentação */
+            user-select: none;
         }
 
-        /* Estilo Decorativo de Fundo (Simulando o padrão da imagem) */
+        /* Estilo Decorativo de Fundo */
         body::before {
             content: "";
             position: fixed;
@@ -74,7 +76,6 @@
             width: 100%;
         }
 
-        /* Painel de Configurações */
         .settings {
             background: rgba(255, 255, 255, 0.1);
             padding: 1.5rem;
@@ -115,7 +116,6 @@
             border-color: var(--yellow-accent);
         }
 
-        /* Área do Número Sorteado */
         .display-area {
             text-align: center;
             margin-bottom: 3rem;
@@ -142,7 +142,6 @@
             100% { transform: translateY(0); }
         }
 
-        /* Botões */
         .actions {
             display: flex;
             gap: 1rem;
@@ -187,11 +186,6 @@
             font-size: 0.9rem;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Histórico */
         .history-container {
             width: 100%;
             background: rgba(0,0,0,0.2);
@@ -235,17 +229,26 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Rodapé com as marcas */
         footer {
-            padding: 1rem;
+            padding: 1.5rem 1rem;
             font-size: 0.8rem;
             text-align: center;
-            opacity: 0.8;
+            opacity: 0.9;
             border-top: 1px solid rgba(255,255,255,0.1);
             background: rgba(0,0,0,0.1);
+            line-height: 1.6;
         }
 
-        /* Modo Fullscreen (Projetor) */
+        footer a {
+            color: var(--yellow-accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -283,7 +286,6 @@
             font-size: 1.5rem;
         }
 
-        /* Mensagens */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -296,7 +298,6 @@
             z-index: 10000;
         }
 
-        /* Responsividade básica */
         @media (max-width: 768px) {
             #lucky-number { font-size: 8rem; }
             .settings { flex-direction: column; width: 100%; }
@@ -312,7 +313,6 @@
     </header>
 
     <div class="container">
-        <!-- Controles -->
         <div class="settings">
             <div class="input-group">
                 <label>Número Mínimo</label>
@@ -327,7 +327,6 @@
             </button>
         </div>
 
-        <!-- Área Central -->
         <div class="display-area">
             <div id="status-msg" style="text-transform: uppercase; font-size: 0.9rem; opacity: 0.7;">Pronto para sortear</div>
             <div id="lucky-number">00</div>
@@ -342,18 +341,14 @@
             </button>
         </div>
 
-        <!-- Histórico -->
         <div class="history-title">Números já sorteados (<span id="count">0</span>)</div>
         <div class="history-container">
-            <div id="history-list">
-                <!-- Itens serão injetados aqui -->
-            </div>
+            <div id="history-list"></div>
         </div>
     </div>
 
-    <div id="toast" class="toast">Todos os números já foram sorteados!</div>
+    <div id="toast" class="toast">Todos os números do intervalo já foram sorteados!</div>
 
-    <!-- Overlay de Tela Cheia -->
     <div id="fs-overlay" class="fullscreen-overlay">
         <button class="fs-close" onclick="toggleFullscreen()">✕</button>
         <div id="fs-status" style="font-size: 2rem; opacity: 0.6; margin-bottom: -2rem;">SORTEANDO...</div>
@@ -361,12 +356,11 @@
     </div>
 
     <footer>
-        Prefeitura Municipal de Carinhanha - Secretaria Municipal de Proteção Social 
-        CPD - Centro de Processamento de Dados <a href="https://github.com/CristovaoRNogueira/sorteador.git" target="_blank">link repositório Sorteador</a>
+        Prefeitura Municipal de Carinhanha - Secretaria Municipal de Proteção Social <br>
+        CPD - Centro de Processamento de Dados | <a href="https://github.com/CristovaoRNogueira/sorteador.git" target="_blank">link repositório Sorteador</a>
     </footer>
 
     <script>
-        // Chaves para o LocalStorage
         const STORAGE_KEY_DRAWN = 'marco_elas_drawn_2026';
         const STORAGE_KEY_MIN = 'marco_elas_min_2026';
         const STORAGE_KEY_MAX = 'marco_elas_max_2026';
@@ -385,35 +379,25 @@
         const minInput = document.getElementById('min-val');
         const maxInput = document.getElementById('max-val');
 
-        // Inicialização do sistema
         window.onload = function() {
             loadSavedData();
-            
-            // Ouvintes para salvar min/max sempre que mudarem
             minInput.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_MIN, minInput.value));
             maxInput.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_MAX, maxInput.value));
         };
 
         function loadSavedData() {
-            // Carregar números sorteados
             const savedDrawn = localStorage.getItem(STORAGE_KEY_DRAWN);
             if (savedDrawn) {
                 drawnNumbers = JSON.parse(savedDrawn);
-                // Popular o histórico visual (do mais recente para o mais antigo)
-                [...drawnNumbers].reverse().forEach(num => {
-                    renderHistoryItem(num);
-                });
+                [...drawnNumbers].reverse().forEach(num => renderHistoryItem(num));
                 
-                // Mostrar o último número sorteado no display principal
                 if (drawnNumbers.length > 0) {
-                    const last = drawnNumbers[drawnNumbers.length - 1];
-                    updateDisplays(last);
+                    updateDisplays(drawnNumbers[drawnNumbers.length - 1]);
                     statusMsg.innerText = "Último número sorteado:";
                 }
                 countSpan.innerText = drawnNumbers.length;
             }
 
-            // Carregar configurações de intervalo
             const savedMin = localStorage.getItem(STORAGE_KEY_MIN);
             const savedMax = localStorage.getItem(STORAGE_KEY_MAX);
             if (savedMin) minInput.value = savedMin;
@@ -431,14 +415,14 @@
                 return;
             }
 
-            // Verificar se ainda há números disponíveis
-            const availableCount = (max - min + 1);
-            if (drawnNumbers.length >= availableCount) {
+            const currentRangeDrawn = drawnNumbers.filter(n => n >= min && n <= max);
+            const totalAvailable = (max - min + 1);
+
+            if (currentRangeDrawn.length >= totalAvailable) {
                 showToast();
                 return;
             }
 
-            // Iniciar animação
             isAnimating = true;
             document.getElementById('btn-draw').disabled = true;
             display.classList.add('animating');
@@ -446,17 +430,16 @@
             statusMsg.innerText = "Sorteando...";
             fsStatus.style.display = 'block';
 
-            // Efeito visual de números rodando
             let counter = 0;
             animationInterval = setInterval(() => {
                 const tempNum = Math.floor(Math.random() * (max - min + 1)) + min;
                 updateDisplays(tempNum);
                 counter++;
 
-                if (counter > 20) { // Duração do "suspense"
+                if (counter > 25) { 
                     finalizeRaffle(min, max);
                 }
-            }, 80);
+            }, 70);
         }
 
         function finalizeRaffle(min, max) {
@@ -468,19 +451,16 @@
             } while (drawnNumbers.includes(result));
 
             drawnNumbers.push(result);
-            
-            // SALVAR NO LOCALSTORAGE
             localStorage.setItem(STORAGE_KEY_DRAWN, JSON.stringify(drawnNumbers));
 
             updateDisplays(result);
-            renderHistoryItem(result, true); // True para adicionar no topo
+            renderHistoryItem(result, true);
 
-            // Finalizar estados
             isAnimating = false;
             document.getElementById('btn-draw').disabled = false;
             display.classList.remove('animating');
             fsDisplay.classList.remove('animating');
-            statusMsg.innerText = "Último número:";
+            statusMsg.innerText = "Sorteado:";
             fsStatus.style.display = 'none';
             countSpan.innerText = drawnNumbers.length;
 
@@ -505,7 +485,7 @@
         }
 
         function resetSystem() {
-            if (confirm("Deseja realmente reiniciar o sorteio? Isso apagará permanentemente o histórico salvo.")) {
+            if (confirm("Deseja realmente reiniciar o sorteio? Isso apagará o histórico salvo.")) {
                 drawnNumbers = [];
                 localStorage.removeItem(STORAGE_KEY_DRAWN);
                 historyList.innerHTML = '';
@@ -532,30 +512,23 @@
                 const oscillator = context.createOscillator();
                 const gain = context.createGain();
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(440, context.currentTime); 
+                oscillator.frequency.setValueAtTime(523.25, context.currentTime); 
                 oscillator.connect(gain);
                 gain.connect(context.destination);
                 gain.gain.setValueAtTime(0, context.currentTime);
                 gain.gain.linearRampToValueAtTime(0.2, context.currentTime + 0.1);
-                gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.4);
+                gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.5);
                 oscillator.start();
-                oscillator.stop(context.currentTime + 0.5);
-            } catch (e) {
-                console.log("Audio not supported");
-            }
+                oscillator.stop(context.currentTime + 0.6);
+            } catch (e) {}
         }
 
-        // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
             if (e.key === ' ' || e.key === 'Enter') {
                 if (!isAnimating) startRaffle();
             }
-            if (e.key === 'f' || e.key === 'F') {
-                toggleFullscreen();
-            }
-            if (e.key === 'Escape' && fsOverlay.classList.contains('active')) {
-                toggleFullscreen();
-            }
+            if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+            if (e.key === 'Escape' && fsOverlay.classList.contains('active')) toggleFullscreen();
         });
     </script>
 </body>
