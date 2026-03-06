@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteador - Março com Elas 2026</title>
+    <style>
+        /* Variáveis de Cores baseadas na imagem */
+        :root {
+            --purple-dark: #4b1a6a;
+            --purple-mid: #7b2c93;
+            --purple-light: #9d44b5;
+            --yellow-accent: #ffcc00;
+            --white: #ffffff;
+            --text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-mid) 100%);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Estilo Decorativo de Fundo (Simulando o padrão da imagem) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .logo-text span {
+            color: var(--yellow-accent);
+            font-style: italic;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Painel de Configurações */
+        .settings {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        input {
+            background: rgba(0,0,0,0.2);
+            border: 2px solid var(--purple-light);
+            padding: 0.8rem;
+            color: white;
+            border-radius: 8px;
+            width: 100px;
+            font-size: 1.2rem;
+            outline: none;
+            text-align: center;
+        }
+
+        input:focus {
+            border-color: var(--yellow-accent);
+        }
+
+        /* Área do Número Sorteado */
+        .display-area {
+            text-align: center;
+            margin-bottom: 3rem;
+            width: 100%;
+        }
+
+        #lucky-number {
+            font-size: 15rem;
+            font-weight: 900;
+            color: var(--white);
+            text-shadow: var(--text-shadow);
+            margin: 1rem 0;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .animating {
+            animation: bounce 0.1s infinite;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Botões */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-main {
+            background: var(--yellow-accent);
+            color: var(--purple-dark);
+            padding: 1.2rem 3rem;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 0 #b38f00;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 0 #b38f00;
+        }
+
+        .btn-main:active {
+            transform: translateY(8px);
+            box-shadow: 0 2px 0 #b38f00;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Histórico */
+        .history-container {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        #history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .history-item {
+            background: var(--purple-light);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Rodapé com as marcas */
+        footer {
+            padding: 1rem;
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.1);
+        }
+
+        /* Modo Fullscreen (Projetor) */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-mid) 100%);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+
+        .fs-number {
+            font-size: 35vw;
+            font-weight: 900;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .fs-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: 2px solid white;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        /* Mensagens */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            display: none;
+            z-index: 10000;
+        }
+
+        /* Responsividade básica */
+        @media (max-width: 768px) {
+            #lucky-number { font-size: 8rem; }
+            .settings { flex-direction: column; width: 100%; }
+            input { width: 100%; }
+            .logo-text { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-text">MARÇO COM <span>ELAS</span> 2026</div>
+    </header>
+
+    <div class="container">
+        <!-- Controles -->
+        <div class="settings">
+            <div class="input-group">
+                <label>Número Mínimo</label>
+                <input type="number" id="min-val" value="1" min="0">
+            </div>
+            <div class="input-group">
+                <label>Número Máximo</label>
+                <input type="number" id="max-val" value="100" min="1">
+            </div>
+            <button class="btn-secondary" onclick="resetSystem()" title="Limpar tudo">
+                Reiniciar
+            </button>
+        </div>
+
+        <!-- Área Central -->
+        <div class="display-area">
+            <div id="status-msg" style="text-transform: uppercase; font-size: 0.9rem; opacity: 0.7;">Pronto para sortear</div>
+            <div id="lucky-number">00</div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-main" onclick="startRaffle()" id="btn-draw">
+                SORTEAR
+            </button>
+            <button class="btn-secondary" onclick="toggleFullscreen()">
+                Tela Cheia (F)
+            </button>
+        </div>
+
+        <!-- Histórico -->
+        <div class="history-title">Números já sorteados (<span id="count">0</span>)</div>
+        <div class="history-container">
+            <div id="history-list">
+                <!-- Itens serão injetados aqui -->
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Todos os números já foram sorteados!</div>
+
+    <!-- Overlay de Tela Cheia -->
+    <div id="fs-overlay" class="fullscreen-overlay">
+        <button class="fs-close" onclick="toggleFullscreen()">✕</button>
+        <div id="fs-status" style="font-size: 2rem; opacity: 0.6; margin-bottom: -2rem;">SORTEANDO...</div>
+        <div id="fs-number" class="fs-number">00</div>
+    </div>
+
+    <footer>
+        Prefeitura Municipal de Carinhanha - Secretaria Municipal de Saúde - Movimento de Mulheres
+    </footer>
+
+    <script>
+        // Chaves para o LocalStorage
+        const STORAGE_KEY_DRAWN = 'marco_elas_drawn_2026';
+        const STORAGE_KEY_MIN = 'marco_elas_min_2026';
+        const STORAGE_KEY_MAX = 'marco_elas_max_2026';
+
+        let drawnNumbers = [];
+        let isAnimating = false;
+        let animationInterval;
+
+        const display = document.getElementById('lucky-number');
+        const fsDisplay = document.getElementById('fs-number');
+        const fsOverlay = document.getElementById('fs-overlay');
+        const historyList = document.getElementById('history-list');
+        const countSpan = document.getElementById('count');
+        const statusMsg = document.getElementById('status-msg');
+        const fsStatus = document.getElementById('fs-status');
+        const minInput = document.getElementById('min-val');
+        const maxInput = document.getElementById('max-val');
+
+        // Inicialização do sistema
+        window.onload = function() {
+            loadSavedData();
+            
+            // Ouvintes para salvar min/max sempre que mudarem
+            minInput.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_MIN, minInput.value));
+            maxInput.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_MAX, maxInput.value));
+        };
+
+        function loadSavedData() {
+            // Carregar números sorteados
+            const savedDrawn = localStorage.getItem(STORAGE_KEY_DRAWN);
+            if (savedDrawn) {
+                drawnNumbers = JSON.parse(savedDrawn);
+                // Popular o histórico visual (do mais recente para o mais antigo)
+                [...drawnNumbers].reverse().forEach(num => {
+                    renderHistoryItem(num);
+                });
+                
+                // Mostrar o último número sorteado no display principal
+                if (drawnNumbers.length > 0) {
+                    const last = drawnNumbers[drawnNumbers.length - 1];
+                    updateDisplays(last);
+                    statusMsg.innerText = "Último número sorteado:";
+                }
+                countSpan.innerText = drawnNumbers.length;
+            }
+
+            // Carregar configurações de intervalo
+            const savedMin = localStorage.getItem(STORAGE_KEY_MIN);
+            const savedMax = localStorage.getItem(STORAGE_KEY_MAX);
+            if (savedMin) minInput.value = savedMin;
+            if (savedMax) maxInput.value = savedMax;
+        }
+
+        function startRaffle() {
+            if (isAnimating) return;
+
+            const min = parseInt(minInput.value);
+            const max = parseInt(maxInput.value);
+
+            if (isNaN(min) || isNaN(max) || min >= max) {
+                alert("Por favor, insira um intervalo válido.");
+                return;
+            }
+
+            // Verificar se ainda há números disponíveis
+            const availableCount = (max - min + 1);
+            if (drawnNumbers.length >= availableCount) {
+                showToast();
+                return;
+            }
+
+            // Iniciar animação
+            isAnimating = true;
+            document.getElementById('btn-draw').disabled = true;
+            display.classList.add('animating');
+            fsDisplay.classList.add('animating');
+            statusMsg.innerText = "Sorteando...";
+            fsStatus.style.display = 'block';
+
+            // Efeito visual de números rodando
+            let counter = 0;
+            animationInterval = setInterval(() => {
+                const tempNum = Math.floor(Math.random() * (max - min + 1)) + min;
+                updateDisplays(tempNum);
+                counter++;
+
+                if (counter > 20) { // Duração do "suspense"
+                    finalizeRaffle(min, max);
+                }
+            }, 80);
+        }
+
+        function finalizeRaffle(min, max) {
+            clearInterval(animationInterval);
+            
+            let result;
+            do {
+                result = Math.floor(Math.random() * (max - min + 1)) + min;
+            } while (drawnNumbers.includes(result));
+
+            drawnNumbers.push(result);
+            
+            // SALVAR NO LOCALSTORAGE
+            localStorage.setItem(STORAGE_KEY_DRAWN, JSON.stringify(drawnNumbers));
+
+            updateDisplays(result);
+            renderHistoryItem(result, true); // True para adicionar no topo
+
+            // Finalizar estados
+            isAnimating = false;
+            document.getElementById('btn-draw').disabled = false;
+            display.classList.remove('animating');
+            fsDisplay.classList.remove('animating');
+            statusMsg.innerText = "Último número:";
+            fsStatus.style.display = 'none';
+            countSpan.innerText = drawnNumbers.length;
+
+            playSuccessSound();
+        }
+
+        function updateDisplays(val) {
+            const formatted = val.toString().padStart(2, '0');
+            display.innerText = formatted;
+            fsDisplay.innerText = formatted;
+        }
+
+        function renderHistoryItem(num, toTop = false) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerText = num.toString().padStart(2, '0');
+            if (toTop) {
+                historyList.prepend(item);
+            } else {
+                historyList.appendChild(item);
+            }
+        }
+
+        function resetSystem() {
+            if (confirm("Deseja realmente reiniciar o sorteio? Isso apagará permanentemente o histórico salvo.")) {
+                drawnNumbers = [];
+                localStorage.removeItem(STORAGE_KEY_DRAWN);
+                historyList.innerHTML = '';
+                countSpan.innerText = '0';
+                display.innerText = '00';
+                fsDisplay.innerText = '00';
+                statusMsg.innerText = "Pronto para sortear";
+            }
+        }
+
+        function toggleFullscreen() {
+            fsOverlay.classList.toggle('active');
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function playSuccessSound() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(440, context.currentTime); 
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                gain.gain.setValueAtTime(0, context.currentTime);
+                gain.gain.linearRampToValueAtTime(0.2, context.currentTime + 0.1);
+                gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.4);
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.5);
+            } catch (e) {
+                console.log("Audio not supported");
+            }
+        }
+
+        // Atalhos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                if (!isAnimating) startRaffle();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+            if (e.key === 'Escape' && fsOverlay.classList.contains('active')) {
+                toggleFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
